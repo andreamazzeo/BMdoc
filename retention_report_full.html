@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Bancomail — Report Fidelizzazione Clienti</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1117;
+    --surface: #161b22;
+    --surface-2: #1c2129;
+    --surface-3: #22272e;
+    --border: #2a3140;
+    --border-light: #353d4a;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #656d76;
+    --accent: #58a6ff;
+    --accent-dim: rgba(88, 166, 255, 0.12);
+    --green: #3fb950;
+    --green-dim: rgba(63, 185, 80, 0.12);
+    --orange: #d29922;
+    --orange-dim: rgba(210, 153, 34, 0.12);
+    --purple: #bc8cff;
+    --purple-dim: rgba(188, 140, 255, 0.12);
+    --red: #f85149;
+    --red-dim: rgba(248, 81, 73, 0.12);
+  }
+
+  @page { margin: 0; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Page structure */
+  .page {
+    width: 1400px;
+    min-height: 1800px;
+    padding: 60px 70px;
+    page-break-after: always;
+    position: relative;
+    background: var(--bg);
+  }
+
+  .page:last-child { page-break-after: avoid; }
+
+  .page-number {
+    position: absolute;
+    bottom: 30px;
+    right: 70px;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .page-footer {
+    position: absolute;
+    bottom: 30px;
+    left: 70px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  /* Cover page */
+  .cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 1800px;
+    padding: 60px 70px;
+  }
+
+  .cover-badge {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 8px 16px;
+    border-radius: 6px;
+    margin-bottom: 40px;
+  }
+
+  .cover h1 {
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    max-width: 900px;
+  }
+
+  .cover h1 span { color: var(--accent); }
+
+  .cover-subtitle {
+    font-size: 20px;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-bottom: 60px;
+    max-width: 700px;
+    line-height: 1.5;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 40px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  .cover-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cover-meta-item .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+  }
+
+  .cover-meta-item .value {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  /* Section headers */
+  .section-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
+  .section-title {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+
+  .section-desc {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    max-width: 700px;
+    line-height: 1.5;
+  }
+
+  /* KPI cards */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+  }
+
+  .kpi-card .label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .kpi-card .value {
+    font-family: 'DM Mono', monospace;
+    font-size: 36px;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .kpi-card .subtext {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  .kpi-card.accent .value { color: var(--accent); }
+  .kpi-card.green .value { color: var(--green); }
+  .kpi-card.orange .value { color: var(--orange); }
+  .kpi-card.purple .value { color: var(--purple); }
+
+  /* Content grid */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+  }
+
+  .panel-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .panel-title .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  /* Bar chart */
+  .chart-container {
+    position: relative;
+    height: 280px;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    padding-top: 30px;
+  }
+
+  .bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .bar-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    position: relative;
+  }
+
+  .bar {
+    width: 100%;
+    max-width: 56px;
+    min-height: 2px;
+  }
+
+  .bar.blue { background: var(--accent); border-radius: 5px 5px 0 0; }
+  .bar.green { background: var(--green); }
+
+  .bar-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    position: absolute;
+    top: -20px;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  .bar-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 10px;
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 24px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+
+  /* Donut chart */
+  .donut-container {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+  }
+
+  .donut-wrapper {
+    position: relative;
+    width: 190px;
+    height: 190px;
+    flex-shrink: 0;
+  }
+
+  .donut-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .donut-center .big {
+    font-family: 'DM Mono', monospace;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--green);
+  }
+
+  .donut-center .small {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .donut-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+  }
+
+  .donut-stat {
+    padding: 14px 18px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .donut-stat .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .donut-stat .stat-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .donut-stat.blue { background: var(--accent-dim); }
+  .donut-stat.blue .stat-value { color: var(--accent); }
+  .donut-stat.green { background: var(--green-dim); }
+  .donut-stat.green .stat-value { color: var(--green); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-dim);
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  thead th:not(:first-child) { text-align: right; }
+
+  tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+  }
+
+  tbody td:not(:first-child) { text-align: right; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tag.blue { background: var(--accent-dim); color: var(--accent); }
+  .tag.green { background: var(--green-dim); color: var(--green); }
+  .tag.orange { background: var(--orange-dim); color: var(--orange); }
+  .tag.purple { background: var(--purple-dim); color: var(--purple); }
+
+  .total-row { font-weight: 700; border-top: 2px solid var(--border-light) !important; }
+  .total-row td { border-top: 2px solid var(--border-light); padding-top: 14px; }
+
+  .highlight-row { background: rgba(88, 166, 255, 0.05); }
+
+  /* Insight boxes */
+  .insight-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .insight-box::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+  }
+
+  .insight-box.green::before { background: var(--green); }
+  .insight-box.orange::before { background: var(--orange); }
+  .insight-box.purple::before { background: var(--purple); }
+  .insight-box.accent::before { background: var(--accent); }
+  .insight-box.red::before { background: var(--red); }
+
+  .insight-box h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .insight-box.green h3 { color: var(--green); }
+  .insight-box.orange h3 { color: var(--orange); }
+  .insight-box.purple h3 { color: var(--purple); }
+  .insight-box.accent h3 { color: var(--accent); }
+  .insight-box.red h3 { color: var(--red); }
+
+  .insight-box p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  /* Time between orders viz */
+  .time-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .time-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px;
+    text-align: center;
+  }
+
+  .time-card .segment-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  .time-card .days-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 48px;
+    font-weight: 500;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .time-card .days-unit {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  .time-card .months-equiv {
+    font-size: 13px;
+    color: var(--text-dim);
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .time-card .months-equiv strong {
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .time-card.green .segment-label { color: var(--green); }
+  .time-card.green .days-value { color: var(--green); }
+  .time-card.orange .segment-label { color: var(--orange); }
+  .time-card.orange .days-value { color: var(--orange); }
+  .time-card.purple .segment-label { color: var(--purple); }
+  .time-card.purple .days-value { color: var(--purple); }
+
+  /* Revenue breakdown horizontal bars */
+  .rev-bar-container {
+    margin-bottom: 16px;
+  }
+
+  .rev-bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 14px;
+    gap: 16px;
+  }
+
+  .rev-bar-label {
+    width: 160px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .rev-bar-track {
+    flex: 1;
+    height: 32px;
+    background: var(--surface-2);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rev-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+  }
+
+  .rev-bar-fill span {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--bg);
+  }
+
+  .rev-bar-amount {
+    width: 120px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Two column layout */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .spacer-24 { height: 24px; }
+  .spacer-40 { height: 40px; }
+
+</style>
+</head>
+<body>
+
+<!-- ==================== PAGE 1: COVER ==================== -->
+<div class="page cover">
+  <div class="cover-badge">Report interno</div>
+  <h1>Analisi <span>Fidelizzazione</span> Clienti</h1>
+  <div class="cover-subtitle">
+    Studio della distribuzione ordini, segmentazione clienti, valore per segmento 
+    e cicli di riacquisto. Dati estratti dal CRM su base storica completa.
+  </div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <span class="label">Azienda</span>
+      <span class="value">Bancomail SpA</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="label">Fonte dati</span>
+      <span class="value">CRM MySQL · Tabella ordini (is_pagato = 'Y')</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="label">Perimetro</span>
+      <span class="value">Storico completo</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="label">Data report</span>
+      <span class="value">18 febbraio 2026</span>
+    </div>
+  </div>
+  <div class="page-number">1 / 5</div>
+</div>
+
+<!-- ==================== PAGE 2: OVERVIEW ==================== -->
+<div class="page">
+  <div class="section-number">01</div>
+  <div class="section-title">Panoramica generale</div>
+  <div class="section-desc">
+    Indicatori chiave sulla composizione della base clienti e incidenza del percorso preventivo sulla fidelizzazione.
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card accent">
+      <div class="label">Clienti totali</div>
+      <div class="value">8.375</div>
+      <div class="subtext">con almeno 1 ordine pagato</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="label">Clienti ricorrenti</div>
+      <div class="value">32,3%</div>
+      <div class="subtext">2.705 clienti con 2+ ordini</div>
+    </div>
+    <div class="kpi-card orange">
+      <div class="label">Incidenza preventivo</div>
+      <div class="value">46,5%</div>
+      <div class="subtext">3.890 clienti passati da PZ</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="label">PZ su ricorrenti</div>
+      <div class="value">59,0%</div>
+      <div class="subtext">1.597 ricorrenti con PZ</div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="panel">
+      <div class="panel-title"><span class="dot" style="background:var(--accent)"></span> Distribuzione ordini per cliente</div>
+      <div class="chart-container" id="barChart"></div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> Senza preventivo</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Con preventivo</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title"><span class="dot" style="background:var(--green)"></span> One-shot vs Ricorrenti</div>
+      <div class="donut-container">
+        <div class="donut-wrapper">
+          <svg viewBox="0 0 200 200" width="190" height="190">
+            <circle cx="100" cy="100" r="78" fill="none" stroke="var(--border)" stroke-width="22"/>
+            <circle cx="100" cy="100" r="78" fill="none" stroke="var(--green)" stroke-width="22"
+              stroke-dasharray="158 332" stroke-dashoffset="123" stroke-linecap="round"
+              style="transform: rotate(-90deg); transform-origin: center;"/>
+            <circle cx="100" cy="100" r="78" fill="none" stroke="var(--accent)" stroke-width="22"
+              stroke-dasharray="332 490" stroke-dashoffset="-35" stroke-linecap="round"
+              style="transform: rotate(-90deg); transform-origin: center;"/>
+          </svg>
+          <div class="donut-center">
+            <div class="big">32,3%</div>
+            <div class="small">ricorrenti</div>
+          </div>
+        </div>
+        <div class="donut-stats">
+          <div class="donut-stat blue">
+            <div class="stat-label">One-shot (1 ordine)</div>
+            <div class="stat-value">5.670</div>
+          </div>
+          <div class="donut-stat green">
+            <div class="stat-label">Ricorrenti (2+ ordini)</div>
+            <div class="stat-value">2.705</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-box green">
+    <h3>Il preventivo fidelizza</h3>
+    <p>
+      Il 59% dei clienti ricorrenti è passato almeno una volta dal percorso preventivo, contro il 41% dei clienti one-shot. 
+      Il contatto diretto creato dal preventivo genera un tasso di riacquisto significativamente superiore.
+    </p>
+  </div>
+
+  <div class="page-footer">Bancomail SpA — Report Fidelizzazione Clienti</div>
+  <div class="page-number">2 / 5</div>
+</div>
+
+<!-- ==================== PAGE 3: DISTRIBUZIONE DETTAGLIATA ==================== -->
+<div class="page">
+  <div class="section-number">02</div>
+  <div class="section-title">Distribuzione dettagliata</div>
+  <div class="section-desc">
+    Breakdown completo per numero di ordini, incidenza preventivo per segmento e segmentazione clienti.
+  </div>
+
+  <div class="panel" style="margin-bottom: 32px;">
+    <div class="panel-title"><span class="dot" style="background:var(--orange)"></span> Dettaglio per numero di ordini</div>
+    <table>
+      <thead>
+        <tr>
+          <th>N° ordini</th>
+          <th>Clienti</th>
+          <th>% sul totale</th>
+          <th>Con preventivo</th>
+          <th>% PZ</th>
+          <th>Segmento</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight-row">
+          <td>1</td><td>5.670</td><td>67,7%</td><td>2.332</td><td>41%</td>
+          <td><span class="tag blue">One-shot</span></td>
+        </tr>
+        <tr><td>2</td><td>1.329</td><td>15,9%</td><td>683</td><td>51%</td>
+          <td><span class="tag green">Ricorrente</span></td></tr>
+        <tr><td>3</td><td>501</td><td>6,0%</td><td>292</td><td>58%</td>
+          <td><span class="tag green">Ricorrente</span></td></tr>
+        <tr><td>4</td><td>277</td><td>3,3%</td><td>181</td><td>65%</td>
+          <td><span class="tag orange">Fedele</span></td></tr>
+        <tr><td>5</td><td>171</td><td>2,0%</td><td>108</td><td>63%</td>
+          <td><span class="tag orange">Fedele</span></td></tr>
+        <tr><td>6-10</td><td>295</td><td>3,5%</td><td>212</td><td>72%</td>
+          <td><span class="tag orange">Fedele</span></td></tr>
+        <tr><td>11-20</td><td>81</td><td>1,0%</td><td>69</td><td>85%</td>
+          <td><span class="tag purple">Top client</span></td></tr>
+        <tr><td>21+</td><td>51</td><td>0,6%</td><td>48</td><td>94%</td>
+          <td><span class="tag purple">Top client</span></td></tr>
+        <tr class="total-row">
+          <td style="font-family:'DM Sans',sans-serif; font-weight:700;">Totale</td>
+          <td>8.375</td><td>100%</td><td>3.925</td><td>47%</td><td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-box orange">
+    <h3>Correlazione preventivo ↔ fedeltà</h3>
+    <p>
+      L'incidenza del preventivo sale in modo lineare con il numero di ordini: dal 41% degli one-shot, 
+      al 51-58% dei ricorrenti, al 65-72% dei fedeli, fino al 85-94% dei top client. 
+      Il dato suggerisce fortemente che il percorso preventivo — con il contatto umano e la personalizzazione dell'offerta — 
+      sia un driver diretto della fidelizzazione.
+    </p>
+  </div>
+
+  <div class="page-footer">Bancomail SpA — Report Fidelizzazione Clienti</div>
+  <div class="page-number">3 / 5</div>
+</div>
+
+<!-- ==================== PAGE 4: VALORE PER SEGMENTO ==================== -->
+<div class="page">
+  <div class="section-number">03</div>
+  <div class="section-title">Valore economico per segmento</div>
+  <div class="section-desc">
+    Analisi del revenue e del valore medio cliente per ciascun segmento di fidelizzazione.
+  </div>
+
+  <div class="panel" style="margin-bottom: 32px;">
+    <div class="panel-title"><span class="dot" style="background:var(--purple)"></span> Revenue e valore medio per segmento</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Segmento</th>
+          <th>Clienti</th>
+          <th>% clienti</th>
+          <th>Media spesa cliente</th>
+          <th>Media per ordine</th>
+          <th>Revenue totale</th>
+          <th>% revenue</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight-row">
+          <td><span class="tag blue">One-shot</span></td>
+          <td>5.670</td><td>67,7%</td><td>309 €</td><td>309 €</td><td>1.752.642 €</td><td>31,9%</td>
+        </tr>
+        <tr>
+          <td><span class="tag green">Ricorrente (2-3)</span></td>
+          <td>1.830</td><td>21,8%</td><td>721 €</td><td>316 €</td><td>1.319.502 €</td><td>24,0%</td>
+        </tr>
+        <tr>
+          <td><span class="tag orange">Fedele (4-10)</span></td>
+          <td>743</td><td>8,9%</td><td>1.934 €</td><td>350 €</td><td>1.436.764 €</td><td>26,2%</td>
+        </tr>
+        <tr>
+          <td><span class="tag purple">Top client (11+)</span></td>
+          <td>132</td><td>1,6%</td><td>7.444 €</td><td>357 €</td><td>982.624 €</td><td>17,9%</td>
+        </tr>
+        <tr class="total-row">
+          <td style="font-family:'DM Sans',sans-serif; font-weight:700;">Totale</td>
+          <td>8.375</td><td>100%</td><td>656 €</td><td>320 €</td><td>5.491.532 €</td><td>100%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="spacer-24"></div>
+
+  <!-- Revenue distribution bars -->
+  <div class="panel" style="margin-bottom: 32px;">
+    <div class="panel-title"><span class="dot" style="background:var(--accent)"></span> Distribuzione revenue per segmento</div>
+    <div class="rev-bar-container">
+      <div class="rev-bar-row">
+        <div class="rev-bar-label">One-shot</div>
+        <div class="rev-bar-track">
+          <div class="rev-bar-fill" style="width:31.9%; background:var(--accent);"><span>31,9%</span></div>
+        </div>
+        <div class="rev-bar-amount">1.753K €</div>
+      </div>
+      <div class="rev-bar-row">
+        <div class="rev-bar-label">Ricorrente (2-3)</div>
+        <div class="rev-bar-track">
+          <div class="rev-bar-fill" style="width:24.0%; background:var(--green);"><span>24,0%</span></div>
+        </div>
+        <div class="rev-bar-amount">1.320K €</div>
+      </div>
+      <div class="rev-bar-row">
+        <div class="rev-bar-label">Fedele (4-10)</div>
+        <div class="rev-bar-track">
+          <div class="rev-bar-fill" style="width:26.2%; background:var(--orange);"><span>26,2%</span></div>
+        </div>
+        <div class="rev-bar-amount">1.437K €</div>
+      </div>
+      <div class="rev-bar-row">
+        <div class="rev-bar-label">Top client (11+)</div>
+        <div class="rev-bar-track">
+          <div class="rev-bar-fill" style="width:17.9%; background:var(--purple);"><span>17,9%</span></div>
+        </div>
+        <div class="rev-bar-amount">983K €</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="insight-box purple">
+      <h3>Un top client vale 24× un one-shot</h3>
+      <p>
+        Il valore lifetime medio di un top client (7.444 €) è 24 volte quello di un one-shot (309 €). 
+        I 132 top client da soli generano quasi 1M€ di revenue storico.
+      </p>
+    </div>
+    <div class="insight-box accent">
+      <h3>Il 32% dei clienti genera il 68% del revenue</h3>
+      <p>
+        I clienti ricorrenti (2.705) rappresentano solo il 32,3% della base ma contribuiscono per 3,74M€ 
+        sul totale di 5,49M€. L'importo medio per ordine è stabile (~309-357€) tra segmenti: 
+        la differenza è nella frequenza, non nel ticket.
+      </p>
+    </div>
+  </div>
+
+  <div class="page-footer">Bancomail SpA — Report Fidelizzazione Clienti</div>
+  <div class="page-number">4 / 5</div>
+</div>
+
+<!-- ==================== PAGE 5: TEMPI DI RIACQUISTO + TAKEAWAY ==================== -->
+<div class="page">
+  <div class="section-number">04</div>
+  <div class="section-title">Ciclo di riacquisto</div>
+  <div class="section-desc">
+    Tempo medio tra un ordine e il successivo per i clienti ricorrenti, segmentato per livello di fidelizzazione.
+  </div>
+
+  <div class="time-grid">
+    <div class="time-card green">
+      <div class="segment-label">Ricorrente (2-3 ordini)</div>
+      <div class="days-value">345</div>
+      <div class="days-unit">giorni medi tra ordini</div>
+      <div class="months-equiv">≈ <strong>11,5 mesi</strong> · 1.751 clienti</div>
+    </div>
+    <div class="time-card orange">
+      <div class="segment-label">Fedele (4-10 ordini)</div>
+      <div class="days-value">298</div>
+      <div class="days-unit">giorni medi tra ordini</div>
+      <div class="months-equiv">≈ <strong>10 mesi</strong> · 741 clienti</div>
+    </div>
+    <div class="time-card purple">
+      <div class="segment-label">Top client (11+ ordini)</div>
+      <div class="days-value">162</div>
+      <div class="days-unit">giorni medi tra ordini</div>
+      <div class="months-equiv">≈ <strong>5,4 mesi</strong> · 132 clienti</div>
+    </div>
+  </div>
+
+  <div class="insight-box orange">
+    <h3>Più il cliente è fedele, più accorcia il ciclo</h3>
+    <p>
+      Il ciclo naturale di riacquisto si riduce progressivamente: da quasi un anno per i ricorrenti base, 
+      a 10 mesi per i fedeli, fino a meno di 6 mesi per i top client. Il pattern suggerisce che 
+      l'esperienza positiva accelera la decisione d'acquisto successiva.
+    </p>
+  </div>
+
+  <div class="spacer-40"></div>
+
+  <div class="section-number">05</div>
+  <div class="section-title">Implicazioni operative</div>
+  <div class="section-desc">Sintesi delle azioni suggerite dai dati.</div>
+
+  <div class="two-col">
+    <div class="insight-box green">
+      <h3>CRM e riattivazione</h3>
+      <p>
+        Con un ciclo di riacquisto di ~11 mesi per i ricorrenti, pianificare campagne email 
+        di riattivazione a 9-10 mesi dall'ultimo ordine. Per i top client, contatto proattivo 
+        ogni 4-5 mesi.
+      </p>
+    </div>
+    <div class="insight-box purple">
+      <h3>Valorizzare il preventivo</h3>
+      <p>
+        Il percorso preventivo è il principale driver di fidelizzazione (59% dei ricorrenti, 94% dei top client). 
+        Favorire il contatto personalizzato anche per gli ordini da listino può migliorare la retention.
+      </p>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="insight-box red">
+      <h3>Tracking conversioni Google Ads</h3>
+      <p>
+        Il tracciamento e-commerce è attualmente non funzionante. Senza fix del dataLayer, 
+        è impossibile misurare il ROI delle campagne e ottimizzare verso clienti ad alto valore. 
+        Priorità tecnica immediata.
+      </p>
+    </div>
+    <div class="insight-box accent">
+      <h3>Lifetime value e costo acquisizione</h3>
+      <p>
+        Il 32% dei clienti diventa ricorrente con un LTV medio di 1.764€. Questo giustifica 
+        un costo di acquisizione più elevato al primo ordine, a patto di poterlo misurare 
+        con un tracking corretto.
+      </p>
+    </div>
+  </div>
+
+  <div class="page-footer">Bancomail SpA — Report Fidelizzazione Clienti</div>
+  <div class="page-number">5 / 5</div>
+</div>
+
+<script>
+// Bar chart
+const rawData = [
+  [1,5670,2332],[2,1329,683],[3,501,292],[4,277,181],[5,171,108],
+  [6,114,82],[7,74,49],[8,48,38],[9,37,30],[10,22,13],
+  [11,23,19],[12,15,14],[13,9,9],[14,8,6],[15,4,4],
+  [16,9,7],[17,7,7],[18,7,6],[19,4,4],[20,6,6],
+  [21,6,6],[23,3,3],[25,3,3],[26,4,4],[27,2,2],
+  [28,1,1],[29,2,2],[30,2,1],[31,1,1],[34,2,2],
+  [36,1,1],[37,1,1],[38,3,3],[39,2,2],[41,2,2],
+  [45,1,1],[47,1,1],[67,1,1],[72,1,1],[120,1,0]
+];
+
+const buckets = [
+  { label: '1', data: rawData.filter(r => r[0] === 1) },
+  { label: '2', data: rawData.filter(r => r[0] === 2) },
+  { label: '3', data: rawData.filter(r => r[0] === 3) },
+  { label: '4', data: rawData.filter(r => r[0] === 4) },
+  { label: '5', data: rawData.filter(r => r[0] === 5) },
+  { label: '6-10', data: rawData.filter(r => r[0] >= 6 && r[0] <= 10) },
+  { label: '11-20', data: rawData.filter(r => r[0] >= 11 && r[0] <= 20) },
+  { label: '21+', data: rawData.filter(r => r[0] >= 21) },
+];
+
+const bucketData = buckets.map(b => {
+  const clients = b.data.reduce((s, r) => s + r[1], 0);
+  const pz = b.data.reduce((s, r) => s + r[2], 0);
+  return { label: b.label, clients, pz, noPz: clients - pz };
+});
+
+const maxClients = Math.max(...bucketData.map(b => b.clients));
+const chartContainer = document.getElementById('barChart');
+
+bucketData.forEach(b => {
+  const group = document.createElement('div');
+  group.className = 'bar-group';
+
+  const heightPct = (b.clients / maxClients) * 82;
+  const pzPct = (b.pz / b.clients) * heightPct;
+  const noPzPct = heightPct - pzPct;
+
+  const stack = document.createElement('div');
+  stack.className = 'bar-stack';
+
+  const valEl = document.createElement('div');
+  valEl.className = 'bar-value';
+  valEl.textContent = b.clients.toLocaleString('it');
+  stack.appendChild(valEl);
+
+  const barNoPz = document.createElement('div');
+  barNoPz.className = 'bar blue';
+  barNoPz.style.height = noPzPct + '%';
+  stack.appendChild(barNoPz);
+
+  const barPz = document.createElement('div');
+  barPz.className = 'bar green';
+  barPz.style.height = pzPct + '%';
+  stack.appendChild(barPz);
+
+  group.appendChild(stack);
+
+  const label = document.createElement('div');
+  label.className = 'bar-label';
+  label.textContent = b.label;
+  group.appendChild(label);
+
+  chartContainer.appendChild(group);
+});
+</script>
+
+</body>
+</html>
