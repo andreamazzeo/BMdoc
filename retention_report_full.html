@@ -27,45 +27,32 @@
     --red-dim: rgba(248, 81, 73, 0.12);
   }
 
-  @page { margin: 0; }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--bg);
     color: var(--text);
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
   }
 
   /* Page structure */
   .page {
-    width: 1400px;
-    min-height: 1800px;
-    padding: 60px 70px;
-    page-break-after: always;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 50px 60px;
     position: relative;
     background: var(--bg);
+    border-bottom: 1px solid var(--border);
   }
 
-  .page:last-child { page-break-after: avoid; }
+  .page:last-child { border-bottom: none; }
 
   .page-number {
-    position: absolute;
-    bottom: 30px;
-    right: 70px;
-    font-size: 12px;
-    color: var(--text-dim);
-    font-family: 'DM Mono', monospace;
+    display: none;
   }
 
   .page-footer {
-    position: absolute;
-    bottom: 30px;
-    left: 70px;
-    font-size: 11px;
-    color: var(--text-dim);
+    display: none;
   }
 
   /* Cover page */
@@ -74,8 +61,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    min-height: 1800px;
-    padding: 60px 70px;
+    padding: 80px 50px;
   }
 
   .cover-badge {
